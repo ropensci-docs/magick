@@ -1,0 +1,12 @@
+{
+  "commit": {
+    "commit": "bb8a5a9e9ae1d488fb6859b9c6c1313fc9201f33",
+    "author": "Jeroen Ooms <jeroenooms@gmail.com>",
+    "time": "2021-03-09 11:41:13",
+    "files": 1,
+    "merge": false,
+    "message": "Fix some urls\n"
+  },
+  "remote": "https://github.com/ropensci/magick",
+  "pkg": "magick"
+}
