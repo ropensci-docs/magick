@@ -1,0 +1,346 @@
+# rOpenSci: The *magick* package
+
+> Advanced Image-Processing in R
+
+Bindings to ImageMagick: the most comprehensive open-source image
+processing library available. Supports many common formats (png, jpeg,
+tiff, pdf, etc) and manipulations (rotate, scale, crop, trim, flip,
+blur, etc). All operations are vectorized via the Magick++ STL meaning
+they operate either on a single frame or a series of frames for working
+with layers, collages, or animation. In RStudio images are automatically
+previewed when printed to the console, resulting in an interactive
+editing environment.
+
+## Documentation
+
+About the R package:
+
+- [Getting started: The magick package: Advanced Image-Processing in
+  R](https://docs.ropensci.org/magick/articles/intro.html)
+- [rOpenSci Community Call
+  (recording)](https://vimeo.com/channels/rocommunitycalls/180799058)
+
+About the underlying library:
+
+- [Magick++
+  Tutorial](https://imagemagick.org/Magick++/tutorial/Magick++_tutorial.pdf)
+- [Magick++ STL
+  Documentation](https://imagemagick.org/Magick++/STL.html)
+
+## Hello World
+
+**Run examples in RStudio** to see live previews of the images! If you
+do not use RStudio, use `image_browse` to open images. On Linux you can
+also use `image_display` to get an X11 preview.
+
+``` r
+
+library(magick)
+frink <- image_read("https://jeroen.github.io/images/frink.png")
+image_trim(frink)
+image_scale(frink, "200x200")
+image_flip(frink)
+image_rotate(frink, 45) ## <-- result of this is shown
+image_negate(frink)
+frink |> 
+  image_background("green") |> 
+  image_flatten() |>
+  image_border("red", "10x10")
+```
+
+``` r
+
+image_rotate(frink, 45) |> image_write("man/figures/frink-rotated.png")
+```
+
+![](reference/figures/frink-rotated.png)
+
+Effects
+
+``` r
+
+image_oilpaint(frink)
+image_implode(frink)
+image_charcoal(frink) ## <-- result of this is shown
+image_blur(frink)
+image_edge(frink)
+```
+
+``` r
+
+image_charcoal(frink) |> image_write("man/figures/frink-charcoal.png")
+```
+
+![](reference/figures/frink-charcoal.png)
+
+Create GIF animation:
+
+``` r
+
+# Download images
+oldlogo <- image_read("https://developer.r-project.org/Logo/Rlogo-2.png")
+newlogo <- image_read("https://jeroen.github.io/images/Rlogo-old.png")
+logos <- c(oldlogo, newlogo)
+logos <- image_scale(logos, "400x400")
+
+# Create GIF
+(animation1 <- image_animate(logos))
+image_write(animation1, "man/figures/anim1.gif")
+
+# Morph effect  <-- result of this is shown
+(animation2 <- image_animate(image_morph(logos, frames = 10)))
+image_write(animation2, "man/figures/anim2.gif")
+```
+
+![](reference/figures/anim2.gif)
+
+Read GIF animation frames. See the [rotating earth example
+GIF](https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif).
+
+``` r
+
+earth <- image_read("https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif")
+length(earth)
+earth[1]
+earth[1:3]
+earth1 <- rev(image_flip(earth)) ## How Australians see earth
+image_write(earth1, "man/figures/earth1.gif") ## <-- result of this is shown
+```
+
+![](reference/figures/earth1.gif)
+
+R logo with dancing banana
+
+``` r
+
+logo <- image_read("https://www.r-project.org/logo/Rlogo.png")
+banana <- image_read("https://jeroen.github.io/images/banana.gif")
+front <- image_scale(banana, "300")
+background <- image_scale(logo, "400")
+frames <- lapply(as.list(front), function(x) image_flatten(c(background, x)))
+image_write(image_animate(image_join(frames)), "man/figures/Rlogo-banana.gif")
+```
+
+![](reference/figures/Rlogo-banana.gif)
+
+## Use magick in Shiny Apps
+
+This demo application shows how to use magick with shiny:
+<https://github.com/jeroen/shinymagick>
+
+## Installation
+
+Binary packages for **macOS** or **Windows** can be installed directly
+from CRAN:
+
+``` r
+
+install.packages("magick")
+```
+
+Installation from source on Linux or OSX requires the imagemagick
+[`Magick++`](https://imagemagick.org/Magick++/Documentation.html)
+library. On **Debian or Ubuntu** install
+[libmagick++-dev](https://packages.debian.org/testing/libmagick++-dev):
+
+    sudo apt-get install -y libmagick++-dev
+
+On **Fedora**, **CentOS or RHEL** we need
+[ImageMagick-c++-devel](https://src.fedoraproject.org/rpms/ImageMagick).
+However on CentOS the system version of ImageMagick is quite old. More
+recent versions are available from the [ImageMagick
+downloads](https://imagemagick.org/download/linux/CentOS/x86_64/)
+website.
+
+    sudo yum install ImageMagick-c++-devel
+
+On **macOS** use
+[imagemagick@6](https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/i/imagemagick@6.rb)
+from Homebrew.
+
+    brew install imagemagick@6
+
+The unversioned homebrew formula`imagemagick` can also be used, however
+it has some unsolved OpenMP problems.
+
+There is also a fork of imagemagick called graphicsmagick, but this
+doesn’t work for this package.
+
+# Package index
+
+## All functions
+
+- [`image_compare()`](https://docs.ropensci.org/magick/reference/analysis.md)
+  [`image_compare_dist()`](https://docs.ropensci.org/magick/reference/analysis.md)
+  [`image_fft()`](https://docs.ropensci.org/magick/reference/analysis.md)
+  : Image Analysis
+- [`image_animate()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_coalesce()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_morph()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_mosaic()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_flatten()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_average()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_append()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_apply()`](https://docs.ropensci.org/magick/reference/animation.md)
+  [`image_montage()`](https://docs.ropensci.org/magick/reference/animation.md)
+  : Image Frames and Animation
+- [`as_EBImage()`](https://docs.ropensci.org/magick/reference/as_EBImage.md)
+  : Convert to EBImage
+- [`image_comment()`](https://docs.ropensci.org/magick/reference/attributes.md)
+  [`image_info()`](https://docs.ropensci.org/magick/reference/attributes.md)
+  : Image Attributes
+- [`autoviewer_enable()`](https://docs.ropensci.org/magick/reference/autoviewer.md)
+  [`autoviewer_disable()`](https://docs.ropensci.org/magick/reference/autoviewer.md)
+  : RStudio Graphics AutoViewer
+- [`image_modulate()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_quantize()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_map()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_ordered_dither()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_channel()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_separate()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_combine()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_transparent()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_background()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_virtual_pixel()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_colorize()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_contrast()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_normalize()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_enhance()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_equalize()`](https://docs.ropensci.org/magick/reference/color.md)
+  [`image_median()`](https://docs.ropensci.org/magick/reference/color.md)
+  : Image Color
+- [`image_composite()`](https://docs.ropensci.org/magick/reference/composite.md)
+  [`image_border()`](https://docs.ropensci.org/magick/reference/composite.md)
+  [`image_frame()`](https://docs.ropensci.org/magick/reference/composite.md)
+  [`image_shadow_mask()`](https://docs.ropensci.org/magick/reference/composite.md)
+  [`image_shadow()`](https://docs.ropensci.org/magick/reference/composite.md)
+  [`image_shade()`](https://docs.ropensci.org/magick/reference/composite.md)
+  : Image Composite
+- [`coder_info()`](https://docs.ropensci.org/magick/reference/config.md)
+  [`magick_config()`](https://docs.ropensci.org/magick/reference/config.md)
+  [`magick_set_seed()`](https://docs.ropensci.org/magick/reference/config.md)
+  : Magick Configuration
+- [`image_set_defines()`](https://docs.ropensci.org/magick/reference/defines.md)
+  : Set encoder defines
+- [`image_graph()`](https://docs.ropensci.org/magick/reference/device.md)
+  [`image_draw()`](https://docs.ropensci.org/magick/reference/device.md)
+  [`image_capture()`](https://docs.ropensci.org/magick/reference/device.md)
+  : Magick Graphics Device
+- [`image_edge()`](https://docs.ropensci.org/magick/reference/edges.md)
+  [`image_canny()`](https://docs.ropensci.org/magick/reference/edges.md)
+  [`image_hough_draw()`](https://docs.ropensci.org/magick/reference/edges.md)
+  [`image_hough_txt()`](https://docs.ropensci.org/magick/reference/edges.md)
+  : Edge / Line Detection
+- [`image_read()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_read_svg()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_read_pdf()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_read_video()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_write()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_convert()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_data()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_raster()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_display()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_browse()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_strip()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_blank()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_destroy()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_join()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_attributes()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`image_get_artifact()`](https://docs.ropensci.org/magick/reference/editing.md)
+  [`demo_image()`](https://docs.ropensci.org/magick/reference/editing.md)
+  : Image Editing
+- [`image_despeckle()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_reducenoise()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_noise()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_blur()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_motion_blur()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_charcoal()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_oilpaint()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_emboss()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_implode()`](https://docs.ropensci.org/magick/reference/effects.md)
+  [`image_negate()`](https://docs.ropensci.org/magick/reference/effects.md)
+  : Image Effects
+- [`image_fx()`](https://docs.ropensci.org/magick/reference/fx.md)
+  [`image_fx_sequence()`](https://docs.ropensci.org/magick/reference/fx.md)
+  : Image FX
+- [`geometry_point()`](https://docs.ropensci.org/magick/reference/geometry.md)
+  [`geometry_area()`](https://docs.ropensci.org/magick/reference/geometry.md)
+  [`geometry_size_pixels()`](https://docs.ropensci.org/magick/reference/geometry.md)
+  [`geometry_size_percent()`](https://docs.ropensci.org/magick/reference/geometry.md)
+  : Geometry Helpers
+- [`image_ggplot()`](https://docs.ropensci.org/magick/reference/image_ggplot.md)
+  : Image to ggplot
+- [`_index_`](https://docs.ropensci.org/magick/reference/magick.md)
+  [`magick`](https://docs.ropensci.org/magick/reference/magick.md)
+  [`magick-package`](https://docs.ropensci.org/magick/reference/magick.md)
+  [`imagemagick`](https://docs.ropensci.org/magick/reference/magick.md)
+  : Magick Image Processing
+- [`image_morphology()`](https://docs.ropensci.org/magick/reference/morphology.md)
+  [`image_convolve()`](https://docs.ropensci.org/magick/reference/morphology.md)
+  : Morphology
+- [`image_ocr()`](https://docs.ropensci.org/magick/reference/ocr.md)
+  [`image_ocr_data()`](https://docs.ropensci.org/magick/reference/ocr.md)
+  : Image Text OCR
+- [`magick_options()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`magick_fonts()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`option_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`filter_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`metric_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`dispose_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`compose_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`colorspace_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`channel_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`image_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`kernel_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`noise_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`gravity_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`orientation_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`morphology_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`style_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`decoration_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`compress_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`distort_types()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`virtual_pixel_methods()`](https://docs.ropensci.org/magick/reference/options.md)
+  [`dump_option_info()`](https://docs.ropensci.org/magick/reference/options.md)
+  : Magick Options
+- [`image_fill()`](https://docs.ropensci.org/magick/reference/painting.md)
+  [`image_annotate()`](https://docs.ropensci.org/magick/reference/painting.md)
+  : Image Painting
+- [`image_connect()`](https://docs.ropensci.org/magick/reference/segmentation.md)
+  [`image_split()`](https://docs.ropensci.org/magick/reference/segmentation.md)
+  [`image_fuzzycmeans()`](https://docs.ropensci.org/magick/reference/segmentation.md)
+  : Image Segmentation
+- [`image_threshold()`](https://docs.ropensci.org/magick/reference/thresholding.md)
+  [`image_level()`](https://docs.ropensci.org/magick/reference/thresholding.md)
+  [`image_lat()`](https://docs.ropensci.org/magick/reference/thresholding.md)
+  : Image thresholding
+- [`image_trim()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_chop()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_rotate()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_resize()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_scale()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_sample()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_crop()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_extent()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_flip()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_flop()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_deskew()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_deskew_angle()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_page()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_repage()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_orient()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_shear()`](https://docs.ropensci.org/magick/reference/transform.md)
+  [`image_distort()`](https://docs.ropensci.org/magick/reference/transform.md)
+  : Image Transform
+- [`image_write_video()`](https://docs.ropensci.org/magick/reference/video.md)
+  [`image_write_gif()`](https://docs.ropensci.org/magick/reference/video.md)
+  : Write Video
+- [`logo`](https://docs.ropensci.org/magick/reference/wizard.md) :
+  Example Images
+
+# Articles
+
+### All vignettes
+
+- [The magick package: Advanced Image-Processing in
+  R](https://docs.ropensci.org/magick/articles/intro.md):

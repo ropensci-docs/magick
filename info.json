@@ -1,0 +1,13 @@
+{
+  "commit": {
+    "commit": "c55e330b996761d15772aa1d162e02a5fae5aa73",
+    "author": "Jeroen Ooms <jeroenooms@gmail.com>",
+    "time": "2026-05-08T14:40:00Z",
+    "files": 1,
+    "merge": false,
+    "message": "Try setting a logo\n"
+  },
+  "repo": "https://github.com/ropensci/magick",
+  "pkg": "magick",
+  "time": "2026-09-02T10:02:45Z"
+}
